@@ -15,24 +15,23 @@ if (process.env.REDISTOGO_URL) {
 }
 
 app.use(logfmt.requestLogger());
+app.use(express.static(__dirname + '/public'));
 
-app.get('/:name', function(req, res) {
+app.get('/', function(req, res) {
+  res.send("<link rel='stylesheet' type='text/css' href='main.css' /><h1>Countzilla</h1><p>This website counts.  We're counting <a href='/foo'>foos</a> for example.</p>");
+});
+
+  app.get('/:name', function(req, res) {
   redis.get('counter-'+req.params.name, function(err, result) {
     if (result == null) result = 0;
-    res.send('<h1>Counting</h1><p>Counter '+ req.params.name + ' was hit ' + result + ' times.  <a href="/+/' + req.params.name +">hit me</a>);
+    res.send("<link rel='stylesheet' type='text/css' href='main.css' /><h1>Counting: " + result + ' ' + req.params.name +'s' + '</h1><p>Counter '+ req.params.name + ' was hit <span class="counter">' + result + '</span> times. <a href="">Reloading this page</a> won\'t change that.  <a href="/add/' + req.params.name +'">hit me to increment</a>');
   });
 });
 
-app.post('/:name', function(req, res) {
-  redis.incr('counter-'+req.params.name, function(err, result) {
-    res.send('Counter ' + req.params.name + ' was incremented to' + result);
-  })
-});
-
 // for demo purposes
-app.get('/+/:name', function(req, res) {
+app.get('/add/:name', function(req, res) {
   redis.incr('counter-'+req.params.name, function(err, result) {
-    res.send('Counter ' + req.params.name + ' was incremented to' + result + ', want to <a href="/' + req.params.name + ">check?</a>");
+    res.send("<link rel='stylesheet' type='text/css' href='/main.css' /><h1>Counter " + req.params.name + ' was incremented to <span class="counter">' + result + '</span></h1><p><a href="">Reloading this page</a> would increase the count.</p><p>Want to <a href="/' + req.params.name + '">check the total?</a>');
   })
 });
 
