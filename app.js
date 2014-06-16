@@ -28,6 +28,12 @@ app.get('/', function(req, res) {
   });
 });
 
+app.post('/:name', function(req, res) {
+  redis.incr('counter-'+req.params.name, function(err, result) {
+    res.json({'counter': req.params.name, 'value': result});
+  });
+});
+
 // for demo purposes
 app.get('/add/:name', function(req, res) {
   redis.incr('counter-'+req.params.name, function(err, result) {
