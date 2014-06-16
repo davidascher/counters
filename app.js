@@ -6,6 +6,7 @@ var redis = require("redis").createClient();
 if (process.env.REDISTOGO_URL) {
   console.log("FOUND REDISTOGO:", process.env.REDISTOGO_URL);
   var rtg   = require("url").parse(process.env.REDISTOGO_URL);
+  console.log('rtg.port',rtg.port, rtg.hostname);
   var redis = require("redis").createClient(rtg.port, rtg.hostname);
 
   redis.auth(rtg.auth.split(":")[1]);
@@ -16,15 +17,16 @@ if (process.env.REDISTOGO_URL) {
 
 app.use(logfmt.requestLogger());
 
-app.get('/', function(req, res) {
-  redis.get('counter', function(err, result) {
-    res.send('Counter was hit ' + result + ' times');
+app.get('/:name', function(req, res) {
+  redis.get('counter-'+req.params.name, function(err, result) {
+    if (result == null) result = 0;
+    res.send('Counter '+ req.params.name + ' was hit ' + result + ' times');
   });
 });
 
-app.get('/count', function(req, res) {
-  redis.incr('counter', function(err, result) {
-    res.send('Counter incremented to' + result);
+app.get('/add/:name', function(req, res) {
+  redis.incr('counter-'+req.params.name, function(err, result) {
+    res.send('Counter ' + req.params.name + ' was incremented to' + result);
   })
 });
 
