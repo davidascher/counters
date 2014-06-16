@@ -19,13 +19,20 @@ app.use(logfmt.requestLogger());
 app.get('/:name', function(req, res) {
   redis.get('counter-'+req.params.name, function(err, result) {
     if (result == null) result = 0;
-    res.send('Counter '+ req.params.name + ' was hit ' + result + ' times');
+    res.send('<h1>Counting</h1><p>Counter '+ req.params.name + ' was hit ' + result + ' times.  <a href="/+/' + req.params.name +">hit me</a>);
   });
 });
 
-app.get('/add/:name', function(req, res) {
+app.post('/:name', function(req, res) {
   redis.incr('counter-'+req.params.name, function(err, result) {
     res.send('Counter ' + req.params.name + ' was incremented to' + result);
+  })
+});
+
+// for demo purposes
+app.get('/+/:name', function(req, res) {
+  redis.incr('counter-'+req.params.name, function(err, result) {
+    res.send('Counter ' + req.params.name + ' was incremented to' + result + ', want to <a href="/' + req.params.name + ">check?</a>");
   })
 });
 
