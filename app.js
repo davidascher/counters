@@ -1,14 +1,13 @@
 var express = require("express");
 var logfmt = require("logfmt");
 var app = express();
-var redis = require("redis").createClient();
 
 if (process.env.REDISTOGO_URL) {
   console.log("FOUND REDISTOGO:", process.env.REDISTOGO_URL);
   var rtg   = require("url").parse(process.env.REDISTOGO_URL);
   console.log('rtg.port',rtg.port, rtg.hostname);
   var redis = require("redis").createClient(rtg.port, rtg.hostname);
-  console.log("GOT REDIS", redis, rtg.auth.split(":")[1]);
+  console.log("GOT REDIS", rtg.auth.split(":")[1]);
   redis.auth(rtg.auth.split(":")[1]);
 } else {
   console.log("didnt' find REDISTOGOURL");
